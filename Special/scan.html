@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dont be sad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #0b0a0d;
+    --pink-deep: #c94f7c;
+    --pink-mid: #e07a9e;
+    --pink-soft: #f2a9c2;
+    --pink-btn: #d9709a;
+    --pink-btn-hover: #c25f89;
+    --cream: #fff3f7;
+    --glow: rgba(240,150,190,0.35);
+  }
+
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+
+  html,body{
+    height:100%;
+    overflow-x:hidden;
+  }
+
+  body{
+    font-family:'Quicksand', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03), transparent 40%),
+      linear-gradient(115deg,
+        var(--black) 0%,
+        var(--black) 38%,
+        #2a1420 48%,
+        #5c2340 56%,
+        var(--pink-deep) 66%,
+        var(--pink-mid) 82%,
+        var(--pink-soft) 100%
+      );
+    background-attachment: fixed;
+  }
+
+  /* ambient sparkles, same as index */
+  .sparkle{
+    position:fixed;
+    border-radius:50%;
+    background:rgba(255,255,255,0.55);
+    pointer-events:none;
+    opacity:0;
+    animation: twinkle 3.5s ease-in-out infinite;
+  }
+
+  @keyframes twinkle{
+    0%,100%{opacity:0; transform:scale(0.6);}
+    50%{opacity:0.85; transform:scale(1.1);}
+  }
+
+  .heart-float{
+    position:fixed;
+    pointer-events:none;
+    color:rgba(255,255,255,0.55);
+    font-size:14px;
+    opacity:0;
+    animation: floatUp 6s ease-in infinite;
+    user-select:none;
+  }
+
+  @keyframes floatUp{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    10%{ opacity:0.7; }
+    90%{ opacity:0.5; }
+    100%{ transform:translateY(-90vh) translateX(20px) rotate(25deg); opacity:0; }
+  }
+
+  .stage{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    padding:32px 24px 48px;
+    max-width:440px;
+    width:100%;
+  }
+
+  /* ---------- RESULT CARD ---------- */
+  .card{
+    width:100%;
+    background: rgba(20,14,18,0.55);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:28px;
+    padding:34px 26px 30px;
+    backdrop-filter: blur(14px);
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    opacity:0;
+    transform:translateY(18px) scale(0.96);
+    animation: cardIn 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+
+  @keyframes cardIn{
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .measuring-line{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:19px;
+    color:var(--cream);
+    letter-spacing:0.2px;
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:3px;
+    min-height:28px;
+  }
+
+  .dot{
+    opacity:0;
+    animation: dotBlink 1.4s infinite;
+  }
+  .dot:nth-child(2){ animation-delay: 0.35s; }
+  .dot:nth-child(3){ animation-delay: 0.7s; }
+
+  @keyframes dotBlink{
+    0%{ opacity:0; }
+    10%{ opacity:1; }
+    70%{ opacity:1; }
+    85%{ opacity:0; }
+    100%{ opacity:0; }
+  }
+
+  .measuring-line.done{
+    display:none;
+  }
+
+  /* ---------- PERCENT ---------- */
+  .percent{
+    margin-top:18px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:clamp(40px, 12vw, 54px);
+    color: var(--pink-soft);
+    text-shadow: 0 0 24px rgba(242,169,194,0.55);
+    opacity:0;
+    letter-spacing:0.5px;
+  }
+
+  .percent.show{
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ---------- BAR ---------- */
+  .bar-track{
+    margin-top:20px;
+    width:100%;
+    height:20px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.14);
+    overflow:hidden;
+    position:relative;
+    opacity:0;
+  }
+
+  .bar-track.show{
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .bar-fill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    position:relative;
+    background: linear-gradient(90deg, var(--pink-deep), var(--pink-mid), var(--pink-soft), var(--pink-mid), var(--pink-deep));
+    background-size: 220% 100%;
+    animation: barShimmer 1.4s linear infinite;
+    transition: width 2.2s cubic-bezier(.22,.75,.35,1);
+    box-shadow: 0 0 16px rgba(224,122,158,0.7);
+  }
+
+  .bar-fill.overfilled{
+    box-shadow: 0 0 22px rgba(242,169,194,0.95), 0 0 40px rgba(224,122,158,0.6);
+  }
+
+  @keyframes barShimmer{
+    0%{ background-position: 0% 0%; }
+    100%{ background-position: -220% 0%; }
+  }
+
+  /* little sparkle cap at the leading edge of the bar while filling */
+  .bar-fill::after{
+    content:"";
+    position:absolute;
+    right:0;
+    top:50%;
+    width:14px;
+    height:14px;
+    transform:translate(50%, -50%);
+    border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0) 70%);
+    opacity:0;
+  }
+
+  .bar-fill.filling::after{
+    opacity:0.9;
+    animation: capPulse 0.5s ease-in-out infinite;
+  }
+
+  @keyframes capPulse{
+    0%,100%{ transform:translate(50%, -50%) scale(0.9); }
+    50%{ transform:translate(50%, -50%) scale(1.3); }
+  }
+
+  /* ---------- WARNING ---------- */
+  .overload-msg{
+    margin-top:16px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    color:#ffe1ec;
+    background: rgba(217,112,154,0.28);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:14px;
+    padding:9px 14px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    opacity:0;
+    transform:scale(0.8);
+  }
+
+  .overload-msg.show{
+    animation: warnPop 0.5s cubic-bezier(.34,1.56,.64,1) forwards, wiggle 0.6s ease-in-out 0.5s 2;
+  }
+
+  @keyframes warnPop{
+    to{ opacity:1; transform:scale(1); }
+  }
+
+  @keyframes wiggle{
+    0%,100%{ transform:rotate(0deg) scale(1); }
+    25%{ transform:rotate(-1.5deg) scale(1.02); }
+    75%{ transform:rotate(1.5deg) scale(1.02); }
+  }
+
+  /* ---------- NAV BUTTONS ---------- */
+  .nav-row{
+    margin-top:30px;
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    width:100%;
+    opacity:0;
+    transform:translateY(12px);
+  }
+
+  .nav-row.show{
+    animation: fadeUp 0.7s ease forwards;
+  }
+
+  .nav-btn{
+    flex:1;
+    border:none;
+    border-radius:999px;
+    padding:13px 16px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    letter-spacing:0.2px;
+    cursor:pointer;
+    transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+
+  .nav-btn.back{
+    background: rgba(255,255,255,0.08);
+    color: var(--cream);
+    border:1px solid rgba(255,255,255,0.22);
+  }
+
+  .nav-btn.back:hover{
+    background: rgba(255,255,255,0.15);
+    transform:translateY(-2px);
+  }
+
+  .nav-btn.next{
+    background: linear-gradient(135deg, var(--pink-btn), #c15e88);
+    color:#ffffff;
+    box-shadow:
+      0 6px 20px rgba(201,79,124,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+
+  .nav-btn.next:hover{
+    background: linear-gradient(135deg, var(--pink-btn-hover), #a94f76);
+    box-shadow: 0 8px 26px rgba(201,79,124,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+    transform:translateY(-2px);
+  }
+
+  .nav-btn:active{
+    transform:translateY(0) scale(0.96);
+  }
+
+  .nav-btn:focus-visible{
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="card">
+
+    <div class="measuring-line" id="measuringLine">
+      Measuring your cuteness
+      <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+    </div>
+
+    <div class="percent" id="percent">0%</div>
+
+    <div class="bar-track" id="barTrack">
+      <div class="bar-fill" id="barFill"></div>
+    </div>
+
+    <div class="overload-msg" id="overloadMsg">💥 Cuteness overload</div>
+
+    <div class="nav-row" id="navRow">
+      <button class="nav-btn back" onclick="goBack()">← Go back</button>
+      <button class="nav-btn next" onclick="goNext()">See what's next →</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // pick the target cuteness number once per load: 110–140
+  const target = Math.floor(Math.random() * (140 - 110 + 1)) + 110;
+
+  const percentEl = document.getElementById('percent');
+  const barFill = document.getElementById('barFill');
+  const barTrack = document.getElementById('barTrack');
+  const measuringLine = document.getElementById('measuringLine');
+  const overloadMsg = document.getElementById('overloadMsg');
+  const navRow = document.getElementById('navRow');
+
+  // The bar's visual track fills to 100% max; anything past 100 in the number
+  // reads as "overload" via a stronger glow + the warning message + wiggle,
+  // since actually drawing past the box edge would look broken rather than cute.
+  const displayPercentOfTrack = Math.min(target, 100);
+  const isOverload = target > 100;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // step 1: "Measuring your cuteness..." plays first (dots animate via CSS)
+    // step 2: after ~1.6s, reveal percent number counting up + bar filling together
+    setTimeout(() => {
+      percentEl.classList.add('show');
+      barTrack.classList.add('show');
+      barFill.classList.add('filling');
+
+      // count-up number animation
+      const duration = 2200;
+      const startTime = performance.now();
+
+      function tick(now){
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        const current = Math.round(eased * target);
+        percentEl.textContent = current + '%';
+
+        if (current > 100){
+          barFill.classList.add('overfilled');
+        }
+
+        if (progress < 1){
+          requestAnimationFrame(tick);
+        } else {
+          percentEl.textContent = target + '%';
+          onCountComplete();
+        }
+      }
+      requestAnimationFrame(tick);
+
+      // fill the bar (capped at track width) in sync with the count
+      requestAnimationFrame(() => {
+        barFill.style.width = displayPercentOfTrack + '%';
+      });
+
+    }, 1600);
+  });
+
+  function onCountComplete(){
+    barFill.classList.remove('filling');
+
+    // stop the "measuring..." dots line
+    measuringLine.classList.add('done');
+
+    // show overload warning if applicable
+    if (isOverload){
+      setTimeout(() => {
+        overloadMsg.classList.add('show');
+      }, 250);
+    }
+
+    // reveal nav buttons after everything settles
+    setTimeout(() => {
+      navRow.classList.add('show');
+    }, isOverload ? 750 : 400);
+  }
+
+  function goBack(){
+    // hard reload of index.html with a cache-busting param so no prior
+    // animation/reveal state persists — it plays from a clean first load
+    window.location.href = "index.html?" + Date.now();
+  }
+
+  function goNext(){
+    window.location.href = "next.html";
+  }
+
+  // ambient sparkles, matching index page
+  function spawnSparkle(){
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    const size = Math.random() * 3 + 2;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.top = Math.random() * 100 + 'vh';
+    s.style.animationDuration = (2.5 + Math.random() * 2.5) + 's';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 6000);
+  }
+  setInterval(spawnSparkle, 500);
+
+  const heartChars = ['💗','💕'];
+  function spawnHeart(){
+    const h = document.createElement('div');
+    h.className = 'heart-float';
+    h.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
+    h.style.left = (55 + Math.random() * 40) + 'vw';
+    h.style.bottom = '-5vh';
+    h.style.fontSize = (12 + Math.random()*10) + 'px';
+    h.style.animationDuration = (5 + Math.random()*3) + 's';
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 9000);
+  }
+  setInterval(spawnHeart, 1400);
+</script>
+
+</body>
+</html>
